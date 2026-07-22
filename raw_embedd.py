@@ -9,7 +9,14 @@ client1 = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 client = HuggingFaceEmbeddings(
-    model_name = 'sentence-transformers/all-MiniLM-L6-v2')
+    model_name = 'sentence-transformers/all-MiniLM-L6-v2',
+    encode_kwargs = {'normalize_embeddings' : True}    
+)
+
+client2 = HuggingFaceEmbeddings(
+    model_name = 'BAAI/bge-m3',
+    encode_kwargs = {'normalize_embeddings' : True}
+)
 
 # conversation = client.chat.completions.create(
 #     model="openai/gpt-oss-120b",
