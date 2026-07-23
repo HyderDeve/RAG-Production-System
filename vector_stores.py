@@ -11,6 +11,9 @@ embeddings_model = HuggingFaceEmbeddings(
     encode_kwargs = {'normalize_embeddings' : True}
 )
 
+#Persistent Directory 
+CHROMA_DIR = './DB/chroma_db'
+
 # Sample documents
 SAMPLE_DOCS = [
     Document(
@@ -50,44 +53,43 @@ SAMPLE_DOCS = [
 
 def chroma_basics():
 
-    with tempfile.TemporaryDirectory() as tmpdir:
 
-        #create store from docs
-        vector_store = Chroma.from_documents(
-            documents = SAMPLE_DOCS, embedding = embeddings_model, persist_directory = tmpdir 
-        )
+    #create store from docs
+    vector_store = Chroma.from_documents(
+        documents = SAMPLE_DOCS, embedding = embeddings_model, persist_directory = CHROMA_DIR 
+    )
 
-        print(f'Vector Store created {vector_store._collection_metadata}\n')
+    print(f'Vector Store created {vector_store._collection_metadata}\n')
 
-        #perform similarity search
-        query = 'What is LangChain?'
-        results = vector_store.similarity_search(query, k=2)
+    #perform similarity search
+    query = 'What is LangChain?'
+    results = vector_store.similarity_search(query, k=2)
 
-        print(f'Top 2 results for query "{query}" :')
-        for i, doc in enumerate(results):
+    print(f'Top 2 results for query "{query}" :')
+    for i, doc in enumerate(results):
 
-            print(f'Result {i+1} : {doc.page_content} (Source: {doc.metadata['source']})')
+        print(f'Result {i+1} : {doc.page_content} (Source: {doc.metadata["source"]})')
 
 
 def similarity_search_with_scores():
 
-    with tempfile.TemporaryDirectory() as tmpdir:
 
-        vector_store = Chroma.from_documents(
-            documents = SAMPLE_DOCS, embedding = embeddings_model, persist_directory = tmpdir
-        )
+    vector_store = Chroma.from_documents(
+        documents = SAMPLE_DOCS, embedding = embeddings_model, persist_directory = CHROMA_DIR
+    )
 
-        query = 'Explain vector stores'
-        results_with_scores = vector_store.similarity_search_with_score(query, k=3)
+    query = 'Explain vector stores'
+    results_with_scores = vector_store.similarity_search_with_score(query, k=3)
 
-        print(f"Top 3 results with scores for query '{query}':")
+    print(f"Top 3 results with scores for query '{query}':")
 
-        for i, (doc, score) in enumerate(results_with_scores):
+    for i, (doc, score) in enumerate(results_with_scores):
 
-            print(f'Result {i+1} : {doc.page_content} (Score: {score:.4f}, Source: {doc.metadata['source']})') #these are distance scores and not similarity scores
+        print(f'Result {i+1} : {doc.page_content} (Score: {score:.4f}, Source: {doc.metadata["source"]})') 
+        # these are distance scores and not similarity scores hence the more close to 0 the more similar the answer is !
 
 
 if __name__ == "__main__":
 
-    # chroma_basics()
-    similarity_search_with_scores()
+    chroma_basics()
+    # similarity_search_with_scores()
