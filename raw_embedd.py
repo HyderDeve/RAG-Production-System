@@ -1,9 +1,13 @@
 from dotenv import load_dotenv
 from groq import Groq
-from langchain_huggingface import HuggingFaceEmbeddings
 import os
 
 load_dotenv()
+os.getenv('HF_HOME') # this is to be set before importing HuggingFaceEmbeddings
+
+from langchain_huggingface import HuggingFaceEmbeddings
+
+
 
 client1 = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
