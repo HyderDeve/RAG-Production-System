@@ -1,14 +1,18 @@
 from langchain_chroma import Chroma
-import tempfile
 from langchain_core.documents import Document
-from langchain_huggingface import HuggingFaceEmbeddings
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
+os.getenv('HF_HOME')
+
+from langchain_huggingface import HuggingFaceEmbeddings
+
 
 embeddings_model = HuggingFaceEmbeddings(
-    model_name = 'sentence-transformers/all-MiniLM-L6-v2',
-    encode_kwargs = {'normalize_embeddings' : True}
+    model_name = 'Qwen/Qwen3-Embedding-0.6B',
+    encode_kwargs = {'normalize_embeddings' : True},
+    # cache_folder = './cache'
 )
 
 #Persistent Directory 
@@ -89,7 +93,37 @@ def similarity_search_with_scores():
         # these are distance scores and not similarity scores hence the more close to 0 the more similar the answer is !
 
 
+def metadata_filtering():
+
+    
+    vector_store = Chroma.from_documents(
+        documents = SAMPLE_DOCS, embedding = embeddings_model, persist_directory = CHROMA_DIR
+    )
+
+    query = 'What databases are available?'
+
+    #without metadata filtering
+    results = vector_store.similarity_search(query, k=5)
+
+    print(f"Top 5 results without metadata filtering for query '{query}':")
+    for i, doc in enumerate(results):
+        print(f'Result {i+1} : {doc.page_content} (Source: {doc.metadata["source"]})')
+
+
+    #with metadata filtering
+    filter_criteria = {'topic' : 'database'}
+
+    filtered_results = vector_store.similarity_search(query, k=5, filter = filter_criteria)
+
+    print(f"Top 5 results with metadata filtering for query '{query}':")
+    for i, doc in enumerate(filtered_results):
+        print(f'Result {i+1} : {doc.page_content} (Source: {doc.metadata["source"]})')
+
+
 if __name__ == "__main__":
 
-    chroma_basics()
+    # chroma_basics()
     # similarity_search_with_scores()
+    metadata_filtering()
+    #each time the embedding model will be changed the vector store must be recreated cause it'll give a dimension error due to the previous embeddings model used in it. 
+    # and more dimensions means higher accuracy in results as in 384 dimensions the answer was in repeatation and in 1024 dimension the answer is unique  
