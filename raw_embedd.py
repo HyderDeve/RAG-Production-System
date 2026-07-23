@@ -9,8 +9,8 @@ client1 = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 client = HuggingFaceEmbeddings(
-    model_name = 'sentence-transformers/all-MiniLM-L6-v2',
-    encode_kwargs = {'normalize_embeddings' : True}    
+        model_name = 'Qwen/Qwen3-Embedding-0.6B',
+        encode_kwargs = {'normalize_embeddings' : True}    
 )
 
 client2 = HuggingFaceEmbeddings(
